@@ -231,6 +231,8 @@ namespace Tetris_v1
             Console.SetCursorPosition(col, row);
             Console.Write(text);
             Console.ResetColor();
+
+            // 업데이트 확인
         }
     }
 }
