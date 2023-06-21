@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Console_Tetirs
+namespace Tetris_v1
 {
     class Program
     {

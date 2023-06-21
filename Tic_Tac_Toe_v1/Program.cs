@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Tic_Tac_Toe
+namespace Tic_Tac_Toe_v1
 {
     class Program
     {
