@@ -6,6 +6,9 @@ namespace Tetris_v1
 {
     class Program
     {
+
+        
+
         // Settings
         static int TetrisRows = 20; // 테트리스창 행 (높이)
         static int TetrisCols = 10; // 테트리스창 열 (넓이)
@@ -14,7 +17,7 @@ namespace Tetris_v1
         static int ConsoleCols = 1 + TetrisCols + 1 + InfoCols + 1; // 콘솔창 열 = 23
 
 
-        static List<bool[,]> TetrisFigures = new List<bool[,]>()
+        static List<bool[,]> TetrisFigures = new List<bool[,]>() 
         {
             new bool[,] // I 
             {
@@ -57,14 +60,17 @@ namespace Tetris_v1
         static int Frame = 0;
         static int FrameToMoveFigure = 15;
 
-        static int CurrentFigureIndex = 2;
+        
+        static int CurrentFigureIndex = 1;
+
+        static bool[,] CurrentFigure = null;
 
         static int CurrentFigureRow = 0; // 현재블록모양의 Y 값
         static int CurrentFigureCol = 0; // 현재블록모양의 X 값
 
-
         //                                       20           10
         static bool[,] TetrisField = new bool[TetrisRows, TetrisCols];
+        static Random random = new Random();
 
         static void Main(string[] args)
         {
@@ -77,6 +83,7 @@ namespace Tetris_v1
 
             Console.BufferHeight = ConsoleRows + 1; // 버퍼창 높이 : 23
             Console.BufferWidth = ConsoleCols; // 버퍼창 넓이 : 23
+            CurrentFigure = TetrisFigures[random.Next(0, TetrisFigures.Count)];
 
             while (true)
             {
@@ -93,14 +100,22 @@ namespace Tetris_v1
 
                     if (key.Key == ConsoleKey.LeftArrow || key.Key == ConsoleKey.A)
                     {
+                        //if (CurrentFigureCol > 1)
+                        //{
+                            
+                        //}
                         // move current figure left
                         CurrentFigureCol--;
+
                     }
 
                     if (key.Key == ConsoleKey.RightArrow || key.Key == ConsoleKey.D)
                     {
-                        // move current figure right
-                        CurrentFigureCol++;
+                        if (CurrentFigureCol < TetrisCols - CurrentFigure.GetLength(1))
+                        {
+                            // move current figure right
+                            CurrentFigureCol++;
+                        }
                     }
 
                     if (key.Key == ConsoleKey.DownArrow || key.Key == ConsoleKey.S)
@@ -124,26 +139,63 @@ namespace Tetris_v1
                     
                 }
 
-                //if (Collision()) // 충돌이 발생했을때?
-                //{
-                //    // AddCurrentFigureToTetrisField()
-                //    // CheckForFullLines()
-                //    // if (lines remove)  Score++;
-                //}
+                if (Collision()) // 충돌이 발생했을때?
+                {
+                    AddCurrentFigureToTetrisField();
+                    CurrentFigure = TetrisFigures[random.Next(0, TetrisFigures.Count)];
+                    CurrentFigureRow = 0;
+                    CurrentFigureCol = 0;
+                    
+                }
 
                 // Redraw UI
                 DrawBorder();
                 DrawInfo();
-
+                DrawTetrisField();
                 DrawCurrentFigure();
 
-                
                 Thread.Sleep(40);
             }
         }
 
         
 
+        static void AddCurrentFigureToTetrisField()
+        {
+            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
+            {
+                for (int col = 0; col < CurrentFigure.GetLength(1); col++)
+                {
+                    if (CurrentFigure[row, col])
+                    {
+                        TetrisField[CurrentFigureRow + row, CurrentFigureCol + col] = true;
+                    }
+                }
+            }
+        }
+
+        static bool Collision()
+        {
+            //    현재블록의 Y값 +  현재 블록의 행의 길이 == 20
+            if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows)
+            {
+                return true;
+            }
+
+            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
+            {
+                for (int col = 0; col < CurrentFigure.GetLength(0); col++)
+                {
+                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1,CurrentFigureCol + col])
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        
         static void DrawBorder()
         {
             #region new string에 관해
@@ -205,20 +257,43 @@ namespace Tetris_v1
             Write(Score.ToString(), 2, 3 + TetrisCols);
             Write("Frame: ", 4, 3 + TetrisCols);
             Write(Frame.ToString(), 5, 3 + TetrisCols);
+            Write("Position: ", 7, 3 + TetrisCols);
+            Write($"{CurrentFigureRow}, {CurrentFigureCol}", 8, 3 + TetrisCols);
+            Write("Keys: ", 10, 3 + TetrisCols);
+            Write($"  ^ ", 12, 3 + TetrisCols);
+            Write($"<   >", 13, 3 + TetrisCols);
+            Write($"  v  ", 14, 3 + TetrisCols);
+        }
+
+        static void DrawTetrisField()
+        {
+            //                                      20
+            for (int row = 0; row < TetrisField.GetLength(0); row++)
+            {
+                //                                     10
+                for (int col = 0; col < TetrisField.GetLength(1); col++)
+                {
+
+                    if (TetrisField[row, col])
+                    {
+                        Write("*", row + 1, col + 1);
+                    }
+                }
+            }
         }
 
         static void DrawCurrentFigure()
         {
-            var currentFigure = TetrisFigures[CurrentFigureIndex];
+            //var currentFigure = TetrisFigures[CurrentFigureIndex];
             //                      2차원배열 행 길이만큼 = 2
-            for (int row = 0; row < currentFigure.GetLength(0); row++)
+            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
             {
                 //                      2차원배열의 1차원배열 길이만큼 = 3
-                for (int col = 0; col < currentFigure.GetLength(1); col++)
+                for (int col = 0; col < CurrentFigure.GetLength(1); col++)
                 {
-                    if (currentFigure[row, col]) // currentFigure[row, col] 안에 값이 true이면 Write 함수 실행, false면 넘어감
+                    if (CurrentFigure[row, col]) // currentFigure[row, col] 안에 값이 true이면 Write 함수 실행, false면 넘어감
                     {
-                        Write("*", row + 1 + CurrentFigureRow, col + 2+ CurrentFigureCol);
+                        Write("*", row + 1 + CurrentFigureRow, col + 1 + CurrentFigureCol);
                     }
                 }
             }
