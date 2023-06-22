@@ -8,15 +8,13 @@ namespace Tetris_v1
 {
     class Program
     {
-
-
-
         // Settings
         static int TetrisRows = 20; // 테트리스창 행 (높이)
         static int TetrisCols = 10; // 테트리스창 열 (넓이)
         static int InfoCols = 10; // 정보창 열 (넓이)
         static int ConsoleRows = 1 + TetrisRows + 1; // 콘솔창 행 = 22
         static int ConsoleCols = 1 + TetrisCols + 1 + InfoCols + 1; // 콘솔창 열 = 23
+
 
         static List<bool[,]> TetrisFigures = new List<bool[,]>()
         {
@@ -66,7 +64,7 @@ namespace Tetris_v1
         static int Frame = 0;
         static int FrameToMoveFigure = 15;
 
-        static bool[,] CurrentFigure = null;
+        static int CurrentFigureIndex = 2;
 
         static int CurrentFigureRow = 0; // 현재블록모양의 Y 값
         static int CurrentFigureCol = 0; // 현재블록모양의 X 값
@@ -115,14 +113,8 @@ namespace Tetris_v1
 
                     if (key.Key == ConsoleKey.LeftArrow || key.Key == ConsoleKey.A)
                     {
+                        // move current figure left
                         CurrentFigureCol--;
-                        //if (CurrentFigureCol)
-                        //{
-                        //    // move current figure left
-                            
-                        //}
-                        
-
                     }
 
                     if (key.Key == ConsoleKey.RightArrow || key.Key == ConsoleKey.D)
@@ -155,20 +147,12 @@ namespace Tetris_v1
 
                 }
 
-                if (Collision()) // 충돌이 발생했을때?
-                {
-                    AddCurrentFigureToTetrisField();
-                    int lines = CheckForFullLines();
-                    Score += ScorePerLines[lines];
-                    CurrentFigure = TetrisFigures[random.Next(0, TetrisFigures.Count)];
-                    CurrentFigureRow = 0;
-                    CurrentFigureCol = 0;
-                    if (Collision())
-                    {
-                        File.AppendAllLines("scores.txt", new List<string>
-                        {
-                            $"[{DateTime.Now.ToLongTimeString()}] {Environment.UserName} => {Score}"
-                        });
+                //if (Collision()) // 충돌이 발생했을때?
+                //{
+                //    // AddCurrentFigureToTetrisField()
+                //    // CheckForFullLines()
+                //    // if (lines remove)  Score++;
+                //}
 
                         var scoreAsString = Score.ToString();
                         scoreAsString += new string(' ', 7 - scoreAsString.Length);
@@ -185,65 +169,19 @@ namespace Tetris_v1
                 // Redraw UI
                 DrawBorder();
                 DrawInfo();
-                DrawTetrisField();
+
                 DrawCurrentFigure();
 
+                
                 Thread.Sleep(40);
             }
         }
 
-        static int CheckForFullLines()
-        {
-            int lines = 0;
-
-            //                                 20
-            for (int row = 0; row < TetrisField.GetLength(0); row++)
-            {
-                bool rowIsFull = true;
-
-                //                              10
-                for (int col = 0; col < TetrisField.GetLength(1); col++)
-                {
-                    if (TetrisField[row,col] == false)
-                    {
-                        rowIsFull = false;
-                        break;
-                    }
-                }
-
-                if (rowIsFull) // rowIsFull이 true라면
-                {
-                    for (int rowToMove = row; rowToMove >= 1; rowToMove--)
-                    {
-                        for (int col = 0; col < TetrisField.GetLength(1); col++)
-                        {
-                            TetrisField[rowToMove, col] = TetrisField[rowToMove - 1, col];
-                        }
-                    }
-
-                    lines++;
-                }
-            }
-            return lines;
-        }
-
-        static void AddCurrentFigureToTetrisField()
-        {
-            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
-            {
-                for (int col = 0; col < CurrentFigure.GetLength(1); col++)
-                {
-                    if (CurrentFigure[row, col]) // CurrentFigure[row, col] 가 true 이면 
-                    {
-                        TetrisField[CurrentFigureRow + row, CurrentFigureCol + col] = true; // 테트리스 필드의 [row, col]값도 true로 변환
-                    }
-                }
-            }
-        }
+        
 
         static bool Collision()
         {
-            //    현재블록의 Y값 +  현재 블록의 행의 길이           20
+            //    현재블록의 Y값 +  현재 블록의 행의 길이 == 20
             if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows)
             {
                 return true;
@@ -253,7 +191,7 @@ namespace Tetris_v1
             {
                 for (int col = 0; col < CurrentFigure.GetLength(0); col++)
                 {
-                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1, CurrentFigureCol + col])
+                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1,CurrentFigureCol + col])
                     {
                         return true;
                     }
@@ -262,7 +200,7 @@ namespace Tetris_v1
 
             return false;
         }
-
+        
         static void DrawBorder()
         {
             #region new string에 관해
@@ -327,17 +265,8 @@ namespace Tetris_v1
             }
             Write("Score: ", 1, 3 + TetrisCols);
             Write(Score.ToString(), 2, 3 + TetrisCols);
-
-            Write("HScore: ", 4, 3 + TetrisCols);
-            Write(HighScore.ToString(), 5, 3 + TetrisCols);
-            Write("Frame: ", 7, 3 + TetrisCols);
-            Write(Frame.ToString(), 8, 3 + TetrisCols);
-            Write("Pos: ", 10, 3 + TetrisCols);
-            Write($"{CurrentFigureRow}, {CurrentFigureCol}", 11, 3 + TetrisCols);
-            Write("Keys: ", 13, 3 + TetrisCols);
-            Write($"  ^ ", 15, 3 + TetrisCols);
-            Write($"<   >", 16, 3 + TetrisCols);
-            Write($"  v  ", 17, 3 + TetrisCols);
+            Write("Frame: ", 4, 3 + TetrisCols);
+            Write(Frame.ToString(), 5, 3 + TetrisCols);
         }
 
         static void DrawTetrisField()
@@ -349,7 +278,7 @@ namespace Tetris_v1
                 for (int col = 0; col < TetrisField.GetLength(1); col++)
                 {
 
-                    if (TetrisField[row, col]) // TetrisField[row, col] 가 true이면 TetrisField에 "*" 표현 
+                    if (TetrisField[row, col])
                     {
                         Write("*", row + 1, col + 1);
                     }
@@ -380,9 +309,7 @@ namespace Tetris_v1
             
             Console.SetCursorPosition(col, row);
             Console.Write(text);
-            
-
-            // 업데이트 확인
+            Console.ResetColor();
         }
     }
-};
+}
