@@ -141,6 +141,12 @@ namespace _99Dan
     {
         static void Main(string[] args)
         {
+            Console.WindowWidth = 30;
+            Console.WindowHeight = 30;
+
+            Console.BufferWidth = 20;
+            Console.BufferHeight = 20;
+
             Game game = new Game();
             game.Process();
 

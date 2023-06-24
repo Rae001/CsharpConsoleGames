@@ -120,7 +120,11 @@ namespace Tetris_v1
 
                     if (key.Key == ConsoleKey.LeftArrow || key.Key == ConsoleKey.A)
                     {
-                        CurrentFigureCol--;
+                        if (CurrentFigureCol > 0)
+                        {
+                            CurrentFigureCol--;
+                        }
+                        
 
                     }
 
@@ -220,7 +224,7 @@ namespace Tetris_v1
                 {
                     for (int rowToMove = row; rowToMove >= 1; rowToMove--)
                     {
-                        for (int col = 0; col < TetrisField.GetLength(1); col++)
+                        for (int col = 0; col < TetrisField.GetLength(1); col++) // 테트리스 필드의 열
                         {
                             TetrisField[rowToMove, col] = TetrisField[rowToMove - 1, col];
                         }
@@ -246,10 +250,10 @@ namespace Tetris_v1
             }
         }
 
-        static bool Collision()
+        static bool Collision() // ????
         {
             //    현재블록의 Y값 +  현재 블록의 행의 길이           20
-            if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows)
+            if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows) // 맨 밑바닥에 블록이 닿았을 때 
             {
                 return true;
             }
@@ -258,7 +262,7 @@ namespace Tetris_v1
             {
                 for (int col = 0; col < CurrentFigure.GetLength(0); col++)
                 {
-                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1, CurrentFigureCol + col])
+                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1, CurrentFigureCol + col]) // 밑에 쌓인 블록 위에 블록이 쌓였을 때
                     {
                         return true;
                     }
@@ -267,9 +271,7 @@ namespace Tetris_v1
 
             return false;
         }
-
-     
-        
+      
         static void DrawBorder()
         {
             #region new string에 관해
@@ -277,52 +279,29 @@ namespace Tetris_v1
             // 새 문자열 클래스의 새 인스턴스를 지정된 횟수만큼 반복되는
             // 지정된 유니코드 문자로 표시된 값으로 초기화했습니다.
             #endregion
-            // SetCursorPosition(0, 0); 을 설정하면 화면이 움직이지 않는다??
             Console.SetCursorPosition(0, 0);
 
             string line = "┌";
-            //                          10
             line += new string('─', TetrisCols);
-            //for (int i = 0; i < TetrisCols; i++)
-            //{
-            //    line += "─";
-            //}
-
-
             line += "┬";
-            //                         10
             line += new string('─', InfoCols);
-            //for (int i = 0; i < InfoCols; i++)
-            //{
-            //    line += "─";
-            //}
             line += "┐";
-            Console.Write(line); // line = 23
-            //                       20
+            Console.Write(line);
             for (int i = 0; i < TetrisRows; i++)
             {
                 string middleLine = "│";
-                //                                10
                 middleLine += new string(' ', TetrisCols);
-
                 middleLine += "│";
-                //                               10
                 middleLine += new string(' ', InfoCols);
-
                 middleLine += "│";
-                Console.Write(middleLine); // middleLine = 23
+                Console.Write(middleLine);
             }
-
             string endLine = "└";
-            //                             10
             endLine += new string('─', TetrisCols);
-
             endLine += "┴";
-            //                             10
             endLine += new string('─', InfoCols);
-
             endLine += "┘";
-            Console.Write(endLine); // endLine = 23
+            Console.Write(endLine);
         }
 
         static void DrawInfo()
@@ -347,17 +326,9 @@ namespace Tetris_v1
             Write($"<   >", 16, 3 + TetrisCols);
             Write($"  v  ", 17, 3 + TetrisCols);
 
-            Write("Frame: ", 4, 3 + TetrisCols);
-            Write(Frame.ToString(), 5, 3 + TetrisCols);
-            Write("Position: ", 7, 3 + TetrisCols);
-            Write($"{CurrentFigureRow}, {CurrentFigureCol}", 8, 3 + TetrisCols);
-            Write("Keys: ", 10, 3 + TetrisCols);
-            Write($"  ^ ", 12, 3 + TetrisCols);
-            Write($"<   >", 13, 3 + TetrisCols);
-            Write($"  v  ", 14, 3 + TetrisCols);
         }
 
-        static void DrawTetrisField()
+        static void DrawTetrisField() // ????
         {
             //                                      20
             for (int row = 0; row < TetrisField.GetLength(0); row++)
@@ -365,14 +336,9 @@ namespace Tetris_v1
                 //                                     10
                 for (int col = 0; col < TetrisField.GetLength(1); col++)
                 {
-
-
                     if (TetrisField[row, col]) // TetrisField[row, col] 가 true이면 TetrisField에 "*" 표현 
-
-                    if (TetrisField[row, col])
-
                     {
-                        Write("*", row + 1, col + 1);
+                        Write("*", row + 1, col + 1); 
                     }
                 }
             }
@@ -380,7 +346,6 @@ namespace Tetris_v1
 
         static void DrawCurrentFigure()
         {
-            //var currentFigure = TetrisFigures[CurrentFigureIndex];
             //                      2차원배열 행 길이만큼 = 2
             for (int row = 0; row < CurrentFigure.GetLength(0); row++)
             {
@@ -394,7 +359,6 @@ namespace Tetris_v1
                 }
             }
         }
-
 
         static void Write(string text, int row, int col)
         {
