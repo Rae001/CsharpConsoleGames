@@ -68,8 +68,6 @@ namespace Tetris_v1
         static int FrameToMoveFigure = 15;
 
 
-        
-        static int CurrentFigureIndex = 1;
 
         static bool[,] CurrentFigure = null;
 
@@ -146,7 +144,7 @@ namespace Tetris_v1
 
                     if (key.Key == ConsoleKey.Spacebar || key.Key == ConsoleKey.UpArrow || key.Key == ConsoleKey.W)
                     {
-                        // Implement 90-degree rotation of current figure
+                        RotateCurrentFigure();
                     }
                 }
 
@@ -155,10 +153,9 @@ namespace Tetris_v1
                 {
                     CurrentFigureRow++;
                     Frame = 0;
-
                 }
 
-                if (Collision()) // 충돌이 발생했을때?
+                if (Collision(CurrentFigure)) // 충돌이 발생했을때?
                 {
                     AddCurrentFigureToTetrisField();
 
@@ -167,7 +164,7 @@ namespace Tetris_v1
                     CurrentFigure = TetrisFigures[random.Next(0, TetrisFigures.Count)];
                     CurrentFigureRow = 0;
                     CurrentFigureCol = 0;
-                    if (Collision())
+                    if (Collision(CurrentFigure))
                     {
                         File.AppendAllLines("scores.txt", new List<string>
                         {
@@ -199,6 +196,23 @@ namespace Tetris_v1
 
                 Thread.Sleep(40);
             }
+        }
+
+        static void RotateCurrentFigure()
+        {
+            var newFigure = new bool[CurrentFigure.GetLength(1), CurrentFigure.GetLength(0)];
+            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
+            {
+                for (int col = 0; col < CurrentFigure.GetLength(1); col++)
+                {
+                    newFigure[col, CurrentFigure.GetLength(0) - row - 1] = CurrentFigure[row, col];
+                }
+            }
+            if (!Collision(newFigure))
+            {
+                CurrentFigure = newFigure;
+            }
+            
         }
 
         static int CheckForFullLines()
@@ -250,19 +264,24 @@ namespace Tetris_v1
             }
         }
 
-        static bool Collision() // ????
+        static bool Collision(bool[,] figure)
         {
-            //    현재블록의 Y값 +  현재 블록의 행의 길이           20
-            if (CurrentFigureRow + CurrentFigure.GetLength(0) == TetrisRows) // 맨 밑바닥에 블록이 닿았을 때 
+            //       블록의x값          10        현재 블록의 열길이
+            if (CurrentFigureCol > TetrisCols - figure.GetLength(1))
+            {
+                return true; 
+            }
+
+            if (CurrentFigureRow + figure.GetLength(0) == TetrisRows) // 맨 밑바닥에 블록이 닿았을 때 
             {
                 return true;
             }
 
-            for (int row = 0; row < CurrentFigure.GetLength(0); row++)
+            for (int row = 0; row < figure.GetLength(0); row++)
             {
-                for (int col = 0; col < CurrentFigure.GetLength(0); col++)
+                for (int col = 0; col < figure.GetLength(1); col++)
                 {
-                    if (CurrentFigure[row, col] && TetrisField[CurrentFigureRow + row + 1, CurrentFigureCol + col]) // 밑에 쌓인 블록 위에 블록이 쌓였을 때
+                    if (figure[row, col] && TetrisField[CurrentFigureRow + row + 1, CurrentFigureCol + col]) // 밑에 쌓인 블록 위에 블록이 쌓였을 때
                     {
                         return true;
                     }
@@ -328,35 +347,43 @@ namespace Tetris_v1
 
         }
 
-        static void DrawTetrisField() // ????
+        static void DrawTetrisField() // OK
         {
-            //                                      20
             for (int row = 0; row < TetrisField.GetLength(0); row++)
             {
-                //                                     10
+                string line = "";
                 for (int col = 0; col < TetrisField.GetLength(1); col++)
                 {
                     if (TetrisField[row, col]) // TetrisField[row, col] 가 true이면 TetrisField에 "*" 표현 
                     {
-                        Write("*", row + 1, col + 1); 
+                        line += "*";
+                    }
+                    else
+                    {
+                        line += " ";    
                     }
                 }
+                Write(line, row + 1, 1);
             }
         }
 
         static void DrawCurrentFigure()
         {
-            //                      2차원배열 행 길이만큼 = 2
             for (int row = 0; row < CurrentFigure.GetLength(0); row++)
             {
-                //                      2차원배열의 1차원배열 길이만큼 = 3
+                string line = "";
                 for (int col = 0; col < CurrentFigure.GetLength(1); col++)
                 {
                     if (CurrentFigure[row, col]) // currentFigure[row, col] 안에 값이 true이면 Write 함수 실행, false면 넘어감
                     {
-                        Write("*", row + 1 + CurrentFigureRow, col + 1 + CurrentFigureCol);
+                        line += "*";
+                    }
+                    else
+                    {
+                        line += " ";
                     }
                 }
+                Write(line, row + 1 + CurrentFigureRow, 1 + CurrentFigureCol);
             }
         }
 
