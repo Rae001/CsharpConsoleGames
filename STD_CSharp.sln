@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tic_Tac_Toe_v1", "Tic_Tac_T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnakeGame", "SnakeGame\SnakeGame.csproj", "{3F6BAC05-A965-4ABB-86B7-67597BEC1090}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StackGame", "StackGame\StackGame.csproj", "{50579C42-63E7-49FE-8938-18460B0E3775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stack", "Stack\Stack.csproj", "{50579C42-63E7-49FE-8938-18460B0E3775}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tetris_v1", "Tetris_v1\Tetris_v1.csproj", "{7627099D-9ABD-4C90-9BB7-18E1AC5655FD}"
 EndProject
