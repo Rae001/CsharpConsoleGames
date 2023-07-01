@@ -16,21 +16,25 @@ namespace Stack
         static int fixedBlockY = 18;
 
         static int score = 0;
+        static int count = 1;
 
         static bool isRight = true;
         static bool isSame = false;
+        static bool isChange = true;
 
         //                                     20      30
         static bool[,] BlockField = new bool[height, width];
 
-        static Random random = new Random();
-
-
+        static int[,] CountField = new int[18, 1] {
+            { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
+            { 0 }, { 0 }, { 10 }, { 9 }, { 8 },{ 7 },
+            { 6 }, { 5 }, { 4 }, { 3 }, { 2 }, { 1 }
+        };
 
         static void Main(string[] args)
         {
             Console.CursorVisible = false;
-
+            
 
             while (true)
             {
@@ -42,12 +46,14 @@ namespace Stack
                         if (movingBlockX == fixedBlockX)
                         {
                             isSame = true;
+                            isChange = !isChange;
 
                             if (isSame == true)
                             {
                                 DrawFixBlock();
-                                if (movingBlockY == 15)
+                                if (movingBlockY == 9)
                                 {
+                                    UpCount();
                                     CheckHigher();
                                 }
                                 else
@@ -56,21 +62,22 @@ namespace Stack
                                 }
                             }
                             score += 100;
-
+                            count++;
                         }
                     }
                 }
                 DrawBoard();
                 DrawBlockField();
+                CheckCount();
                 DrawInfo();
-                MoveBock();
+                MoveBlock();
                 Thread.Sleep(60);
             }
-
         }
 
         static void DrawBoard()
         {
+
             Console.SetCursorPosition(0, 0);
 
             //├
@@ -99,15 +106,15 @@ namespace Stack
 
             Console.SetCursorPosition(7, 4);
             Console.Write("Press the SpaceBar");
+
         }
         static void Write(string shape, int x, int y)
         {
-            Console.ForegroundColor = DrawRandomColor();
             Console.SetCursorPosition(x, y);
             Console.Write(shape);
             Console.ResetColor();
         }
-        static void MoveBock()
+        static void MoveBlock()
         {
             if (isRight == true)
             {
@@ -118,21 +125,22 @@ namespace Stack
                 movingBlockX--;
             }
 
-            if (movingBlockX == 2 || movingBlockX == (width - 2))
+            if (movingBlockX == 4 || movingBlockX == (width - 4))
             {
                 isRight = !isRight;
             }
             Write("#", movingBlockX, movingBlockY);
+
+
         }
         static void DrawBlockField()
         {
+
             BlockField[fixedBlockY, fixedBlockX] = true;
-            //                            1 ~ 19
             for (int y = 1; y < BlockField.GetLength(0) - 1; y++)
             {
                 string block = "";
-                //                            1 ~ 28
-                for (int x = 1; x < BlockField.GetLength(1) - 2; x++)
+                for (int x = 3; x < BlockField.GetLength(1) - 2; x++)
                 {
                     if (BlockField[y, x])
                     {
@@ -143,16 +151,17 @@ namespace Stack
                         block += " ";
                     }
                 }
-                Write(block, 2, y);
+                Write(block, 4, y);
             }
         }
         static void DrawFixBlock()
         {
+
             BlockField[movingBlockY, movingBlockX] = true;
             for (int y = 1; y < BlockField.GetLength(0) - 1; y++)
             {
                 string block = "";
-                for (int x = 1; x < BlockField.GetLength(1) - 2; x++)
+                for (int x = 3; x < BlockField.GetLength(1) - 2; x++)
                 {
                     if (BlockField[y, x])
                     {
@@ -163,7 +172,8 @@ namespace Stack
                         block += " ";
                     }
                 }
-                Write(block, 2, y);
+                Write(block, 4, y);
+
             }
         }
         static void CheckHigher()
@@ -179,10 +189,22 @@ namespace Stack
             }
         }
 
-        static ConsoleColor DrawRandomColor()
+        static void CheckCount()
         {
-            var consoleColors = Enum.GetValues(typeof(ConsoleColor));
-            return (ConsoleColor)consoleColors.GetValue(random.Next(consoleColors.Length));
+            for (int y = CountField.GetLength(0) - 1; y > 7; y--)
+            {
+                Console.SetCursorPosition(2, y + 1);
+                Console.Write(CountField[y, 0]);
+            }
         }
+        static void UpCount()
+        {
+            int count = 1;
+            for (int y = CountField.GetLength(0) - 1; y > 7; y--)
+            {
+                CountField[y, 0] += count;
+            }
+        }
+
     }
 }
